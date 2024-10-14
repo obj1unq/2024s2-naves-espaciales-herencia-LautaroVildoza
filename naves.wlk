@@ -1,21 +1,46 @@
-class NaveDeCarga {
+class Nave {
+	var property velocidad = 0
 
-	var velocidad = 0
+	method propulsar() {
+		self.aumentarVelocidad(20000)
+	}
+
+	method aumentarVelocidad(cuanto) {
+		velocidad = (velocidad + cuanto).min(300000)
+	}
+
+	method preparar() {
+	  	self.aumentarVelocidad(15000)
+	}
+
+	method encontrarEnemigo() {
+	  self.recibirAmenaza()
+	  self.propulsar()
+	}
+
+	method recibirAmenaza() 
+	  
+	
+}
+
+
+class NaveDeCarga inherits Nave {
+
 	var property carga = 0
 
 	method sobrecargada() = carga > 100000
 
 	method excedidaDeVelocidad() = velocidad > 100000
 
-	method recibirAmenaza() {
+	override method recibirAmenaza() {
 		carga = 0
 	}
 
 }
 
-class NaveDePasajeros {
+class NaveDePasajeros inherits Nave{
 
-	var velocidad = 0
+	
 	var property alarma = false
 	const cantidadDePasajeros = 0
 
@@ -25,17 +50,17 @@ class NaveDePasajeros {
 
 	method estaEnPeligro() = velocidad > self.velocidadMaximaLegal() or alarma
 
-	method recibirAmenaza() {
+	override method recibirAmenaza() {
 		alarma = true
 	}
 
 }
 
-class NaveDeCombate {
-	var property velocidad = 0
+class NaveDeCombate inherits Nave{
+	
 	var property modo = reposo
 	const property mensajesEmitidos = []
-
+	
 	method emitirMensaje(mensaje) {
 		mensajesEmitidos.add(mensaje)
 	}
@@ -44,10 +69,14 @@ class NaveDeCombate {
 
 	method estaInvisible() = velocidad < 10000 and modo.invisible()
 
-	method recibirAmenaza() {
+	override method recibirAmenaza() {
 		modo.recibirAmenaza(self)
 	}
 
+	override method preparar(){
+	super()
+	modo.preparar(self)
+  }
 }
 
 object reposo {
@@ -58,6 +87,10 @@ object reposo {
 		nave.emitirMensaje("¡RETIRADA!")
 	}
 
+	method preparar(nave) {
+	  nave.emitirMensaje("Saliendo en misión")
+	  nave.modo(ataque)
+	}
 }
 
 object ataque {
@@ -68,4 +101,25 @@ object ataque {
 		nave.emitirMensaje("Enemigo encontrado")
 	}
 
+	method preparar(nave) {
+	  nave.emitirMensaje("Volviendo a la base")
+	}
+}
+
+class NaveDeResiduos inherits NaveDeCarga {
+  var property sellado = false
+
+  method sellarAlVacio() {
+	sellado = true
+  }
+
+  override method recibirAmenaza() {
+	self.sellarAlVacio() 
+	velocidad = 0
+  }
+
+  override method preparar(){
+	super()
+	self.sellarAlVacio()
+  }
 }

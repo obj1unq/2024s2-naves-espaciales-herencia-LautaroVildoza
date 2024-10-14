@@ -84,3 +84,66 @@ describe "Nave de combate" {
 		assert.equals("Enemigo encontrado", naveEnAtaque.ultimoMensaje())
 	}
 }
+
+describe "Propulsar" {
+	const naveVacia = new NaveDeCarga()
+	const naveConPasajeros = new NaveDePasajeros(cantidadDePasajeros = 296, velocidad = 290000) 
+  test "propulsarNaveDeCarga" {
+	naveVacia.propulsar()
+	assert.equals(20000, naveVacia.velocidad())
+  }
+
+  test "propulsarNaveConPasajeros" {
+	naveConPasajeros.propulsar()
+	assert.equals(300000, naveConPasajeros.velocidad())
+  }
+}
+
+describe "Nave de residuos" {
+	const naveDeResiduosRadioactivo = new NaveDeResiduos(velocidad = 10000, carga = 5000)
+  test "no pierde su carga" {
+	naveDeResiduosRadioactivo.recibirAmenaza()
+	assert.equals(5000, naveDeResiduosRadioactivo.carga())
+	assert.equals(0, naveDeResiduosRadioactivo.velocidad())
+	assert.that(naveDeResiduosRadioactivo.sellado())
+  }
+}
+
+describe "prepararse para volar" {
+	const naveConPasajeros = new NaveDePasajeros(cantidadDePasajeros = 296, velocidad = 290000) 
+	const naveDeResiduosRadioactivo = new NaveDeResiduos(carga = 5000)
+	const naveEnAtaque = new NaveDeCombate(modo = ataque)
+	const naveEnReposo = new NaveDeCombate()
+  test "nave de pasajeros" {
+	naveConPasajeros.preparar()
+	assert.equals(300000, naveConPasajeros.velocidad())
+	}
+
+	test "nave de residuos" {
+	  naveDeResiduosRadioactivo.preparar()
+	  assert.equals(15000, naveDeResiduosRadioactivo.velocidad())
+	  assert.that(naveDeResiduosRadioactivo.sellado())
+	}
+
+	test "nave de combate" {
+	  naveEnAtaque.preparar()
+	  assert.equals(15000, naveEnAtaque.velocidad())
+	  assert.equals("Volviendo a la base", naveEnAtaque.ultimoMensaje())
+	}
+
+	test "nave en reposo" {
+	  naveEnReposo.preparar()
+	  assert.equals(15000, naveEnReposo.velocidad())
+	  assert.equals("Saliendo en misión", naveEnReposo.ultimoMensaje())
+	  assert.equals(ataque, naveEnReposo.modo())
+	}
+}
+
+describe "nave se encuentra a enemigo" {
+	const naveConPasajeros = new NaveDePasajeros(cantidadDePasajeros = 296) 
+  test "description" {
+	naveConPasajeros.encontrarEnemigo()
+	assert.equals(20000, naveConPasajeros.velocidad())
+	assert.that(naveConPasajeros.alarma())
+  }
+}
